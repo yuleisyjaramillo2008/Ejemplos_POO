@@ -1,0 +1,71 @@
+// 1. Interfaz del servicio de alertas
+interface ServicioAlerta {
+    void enviarAlerta(String nivel, String mensaje);
+}
+
+// 2. Servicio básico (salida simple sin formato)
+class ServicioAlertaBasico implements ServicioAlerta {
+    @Override
+    public void enviarAlerta(String nivel, String mensaje) {
+        // Solo imprime texto plano
+        System.out.println(nivel + ": " + mensaje);
+    }
+}
+
+// 3. El Wrapper (Añade la interfaz visual y marcos decorativos)
+class AlertaVisualWrapper implements ServicioAlerta {
+    private final ServicioAlerta servicioOriginal;
+
+    public AlertaVisualWrapper(ServicioAlerta servicioOriginal) {
+        this.servicioOriginal = servicioOriginal;
+    }
+
+    @Override
+    public void enviarAlerta(String nivel, String mensaje) {
+        String icono;
+        String marco;
+
+        // Personalización según la severidad
+        switch (nivel.toUpperCase()) {
+            case "CRITICO":
+                icono = "🔥 [ALERTA CRÍTICA]";
+                marco = "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░";
+                break;
+            case "ADVERTENCIA":
+                icono = "⚠️  [ADVERTENCIA]";
+                marco = "--------------------------------------------------------";
+                break;
+            default:
+                icono = "ℹ️  [INFORMACIÓN]";
+                marco = "========================================================";
+                break;
+        }
+
+        // Renderizado visual en consola
+        System.out.println("\n" + marco);
+        System.out.println("  " + icono);
+        System.out.println("  Hora    : " + java.time.LocalTime.now().toString().substring(0, 8));
+        System.out.print("  Mensaje : ");
+        
+        // Ejecuta la lógica original delegada
+        servicioOriginal.enviarAlerta(nivel, mensaje);
+
+        System.out.println(marco + "\n");
+    }
+}
+
+// Clase ejecutable
+public class Ejemplo2 {
+    public static void main(String[] args) {
+        // Instancia base
+        ServicioAlerta basico = new ServicioAlertaBasico();
+
+        // Envolvemos el servicio base con el wrapper visual
+        ServicioAlerta alertaVisual = new AlertaVisualWrapper(basico);
+
+        // Probamos diferentes tipos de alertas
+        alertaVisual.enviarAlerta("INFO", "Conexión a la base de datos establecida.");
+        alertaVisual.enviarAlerta("ADVERTENCIA", "Uso de memoria RAM superó el 85%.");
+        alertaVisual.enviarAlerta("CRITICO", "Fallo en el servidor: Intento de acceso no autorizado.");
+    }
+}
