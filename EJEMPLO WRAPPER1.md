@@ -1,3 +1,4 @@
+```java
 // 1. La interfaz objetivo
 interface ServicioPago {
     void procesarPago(double monto);
@@ -39,3 +40,4 @@ public class Ejemplo1 {
         stripeConLog.procesarPago(150.00);
     }
 }
+```
