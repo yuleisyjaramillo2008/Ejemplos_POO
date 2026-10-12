@@ -1,0 +1,41 @@
+// 1. La interfaz objetivo
+interface ServicioPago {
+    void procesarPago(double monto);
+}
+
+// 2. La clase original
+class ServicioPagoStripe implements ServicioPago {
+    @Override
+    public void procesarPago(double monto) {
+        System.out.println("Procesando $" + monto + " a través de Stripe.");
+    }
+}
+
+// 3. La clase Wrapper (Envoltorio)
+class ServicioPagoConLogWrapper implements ServicioPago {
+    private final ServicioPago servicioEnvuelto; // El objeto envuelto
+
+    public ServicioPagoConLogWrapper(ServicioPago servicioEnvuelto) {
+        this.servicioEnvuelto = servicioEnvuelto;
+    }
+
+    @Override
+    public void procesarPago(double monto) {
+        System.out.println("[LOG] Pago iniciado: $" + monto + " a las " + java.time.LocalTime.now());
+        
+        // Delega la llamada al objeto original
+        servicioEnvuelto.procesarPago(monto);
+        
+        System.out.println("[LOG] Pago completado con éxito.");
+    }
+}
+
+// Uso
+public class Ejemplo1 {
+    public static void main(String[] args) {
+        ServicioPago stripe = new ServicioPagoStripe();
+        ServicioPago stripeConLog = new ServicioPagoConLogWrapper(stripe);
+
+        stripeConLog.procesarPago(150.00);
+    }
+}
